@@ -1,0 +1,81 @@
+---
+title: "Starwars"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+Load and view data
+```{r}
+library(tidyverse)
+
+view(starwars)
+
+glimpse(starwars)
+```
+
+
+Frequency Distribution
+
+```{r}
+
+starwars%>%
+  drop_na(gender)%>%
+  filter(hair_color %in% c("brown", "white", "black"))%>%
+  count(hair_color)%>%
+  mutate(Percent= n/sum(n))%>%
+  rename(antal =n)
+
+```
+
+
+
+Cross table 
+
+```{r}
+
+starwars%>%
+  drop_na(gender)%>%
+  filter(hair_color %in% c("brown", "white", "black"))%>%
+  group_by(hair_color)%>%
+  select(hair_color, gender)%>%
+  count(gender)%>%
+  pivot_wider(names_from = gender, values_from = n)%>%
+  mutate(total= feminine + masculine)
+
+```
+
+Convert from numerical into categorical. 
+```{r}
+starwars1=starwars%>%
+  drop_na(height)%>%
+  filter(hair_color %in% c("brown", "white", "black"))%>%
+  mutate(height = ifelse(height >= 180, 1,0), height= factor(height, labels = c("small", "tall")))%>%
+  group_by(hair_color, height)%>%
+  select(hair_color, height)%>%
+  count(height)%>%
+  pivot_wider(names_from = height, values_from = n)%>%
+  mutate(total= small + tall)
+
+starwars1
+```
+
+Bar chart
+
+```{r}
+
+starwars%>%
+  drop_na(height)%>%
+  filter(hair_color %in% c("brown", "white", "black"))%>%
+  mutate(height = ifelse(height >= 180, 1,0), height= factor(height, labels = c("small", "tall")))%>%
+  group_by(hair_color, height)%>%
+  select(hair_color, height)%>%
+  count(height)%>%
+  ggplot(aes(x=height, y=n, fill=hair_color))+
+  geom_col()+
+  scale_fill_manual(values = c("black", "brown", "white"))
+
+```
+
+
