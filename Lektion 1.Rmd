@@ -1,0 +1,339 @@
+---
+title: "R Notebook"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+```{r}
+library(tidyverse)
+library(plotrix)
+library(qcc)
+library(scatterplot3d)
+
+
+```
+
+#Installing R and Rstudio
+
+#Rstudio Basics
+
+```{r}
+4.6 * (2 + 3)^4
+
+############
+a=4
+a
+############
+
+b= c(2,5,7)
+b
+###########
+
+aa= matrix(c(6,4,8,1), ncol = 4, nrow = 4)
+aa
+#############
+aaa=matrix(c(6,4,8,1,
+             1,2,3,4,
+             3,4,2,4,
+             5,2,5,7), ncol = 4, nrow = 4)
+
+aaa
+
+```
+
+```{r}
+x <- 1:7
+x
+
+y <- seq(1, 20, by = 2)
+y
+
+y[c(2, 3, 4)]
+
+length(y)
+
+```
+
+#Statistics Basics
+
+#Graphs to descripe Categorical variables
+
+**Frequency Distribution**
+
+```{r}
+volley <- matrix(c(50,90,40, (50/180)*100, (90/180)*100, (40/180)*100), ncol = 2, nrow = 3)
+colnames(volley) <- c("Membership", "Percent")
+rownames(volley) <- c("Current", "Former", "Never")
+volley <- as.table(volley)
+volley
+
+```
+
+**Cross Table**
+
+```{r}
+volley1 <- matrix(c(30, 20, 50, 60, 30, 90, 20, 20, 40), ncol = 3, byrow = TRUE)
+colnames(volley1) <- c("Male", "Female", "Total")
+rownames(volley1) <- c("Current", "Former", "Never")
+volley1 <- as.table(volley1)
+volley1
+```
+
+**From numeric to categorical**
+
+```{r}
+set.seed(123)
+marital = sample(seq(from = 1, to = 2, by = 1), size = 150, replace = T) #data for marital status
+membership = sample(seq(from = 1, to = 3, by = 1), size = 150, replace = T) #data for membership
+data = data.frame(marital, membership) # Create a dataframe
+
+glimpse(data)
+
+
+```
+
+```{r}
+labs <- c("single", "married") # define the attributes for marital status
+labs1 = c("former", "current", "never") # define attributes for membership
+marital <- factor(data$marital, labels = labs) # assign attributes
+membership = factor(data$member, labels = labs1) # assign attributes
+
+marital;membership
+```
+
+```{r}
+table <- xtabs(~membership + marital) 
+table
+```
+
+```{r}
+barplot(table, ylim=c(0,110), legend=T,main= 'Volleyball Membership',
+args.legend = list(x="top"), col = c("skyblue", "red", "green"))
+
+```
+
+##Exercise
+
+```{r}
+
+library(stargazer) # Package made to export regression and summary tables
+library(haven) # And a package for loading different data types fast(er)
+#### Load some data that we want to test out
+# Data comes from an experiment run by Bertrand and Mullainathan (2004)
+# on the effect of having a non-black sounding name.
+dat <- read_dta("http://masteringmetrics.com/wp-content/uploads/2015/02/bm.dta")
+glimpse(dat)
+```
+
+```{r}
+labs1 = c("No interview call", "Interveiew call") # define attributes for interview call
+labs2 = c("white american", "african american") # define attributes for race
+interview = factor(dat$call, labels = labs1) # assign attributes
+race = factor(dat$black, labels = labs2) # assign attributes
+table <- xtabs(~interview + race)
+table
+```
+
+```{r}
+barplot(table, ylim=c(0,3200), legend=T,main= 'Race and call for job interviews',
+args.legend = list(x="top"), col = c("skyblue", "yellow"))
+
+```
+
+**Pie Chart**
+
+```{r}
+ms <- matrix(c(37.69, 36.54, 16.03, 4.90, 4.26, 0.58), ncol = 1, byrow = T)
+colnames(ms) <- c("EU market")
+rownames(ms) <- c("Firefox","Google chrome", "Internet Explorer", "Safari", "Opera", "Others")
+as.table(ms)
+```
+
+```{r}
+pie(ms, labels = c("Firefox", "Google chrome", "Internet Explorer", "Safari", "Opera", "Others"))
+```
+
+```{r}
+par(mar=c(2,10,10,10))
+par(cex=1)
+labels= c("Firefox", "Google chrome", "Internet Explorer", "Safari", "Opera", "Others")
+pct <- round(ms/sum(ms)*100)
+lbs= paste(labels, pct)
+lbs= paste(lbs, "%",sep="")
+pie3D(ms, labels = lbs, explode=0.1, radius=.8, theta = 1.2, labelcex = 1.4)
+```
+
+**Pareto Chart**
+
+```{r}
+counts <- matrix(c(12, 29, 18, 3, 34, 4), ncol = 1, byrow = T)
+rownames(counts) <- c("Weather", "Overslept", "Alarm Failure", "Time Change",
+"Traffic", "Other")
+colnames(counts) <- c("Reason for being late")
+counts
+```
+
+```{r}
+
+pareto.chart(counts[,1])
+
+```
+
+#Graphs to descripe Numerical values
+
+##Histograms
+
+```{r}
+x <- rnorm(1000, mean=0, sd = 1); y <- rf(1000, 10, 20); z <- -rf(1000, 10, 20)
+
+hist(x, col = rgb(0.8, 0.8, 1), main = "Normal distribution")
+hist(y, col = rgb(0.8, 0.8, 1), main = "Right-skewed")
+hist(z, col = rgb(0.8, 0.8, 1), main = "Left-skewed")
+
+
+```
+
+```{r}
+hist(x, breaks = 25, col = rgb(0.8, 0.8, 1), main = "Normal distribution")
+
+```
+
+##Scatterplot
+
+```{r}
+attach(mtcars) # this contains a dataset which is included in R by default
+
+plot(wt, mpg, main="Scatterplot", xlab="Car Weight ", ylab="Miles Per Gallon ", pch=16)
+
+```
+
+```{r}
+scatterplot3d(wt, disp, mpg, pch=16, highlight.3d = TRUE, type="h", main="3D Scatterplot")
+```
+
+##Time series plots
+
+```{r}
+library(Ecdat)
+data(Money) # This data matrix contains time series of interest rates
+view(Money)
+
+interest = Money[, 4]
+
+interest = ts(interest, start = c(1967, 1), end = c(1998, 4), frequency = 4)
+
+plot(interest, col="blue", main="Interest rate")
+
+```
+
+#Exercise
+
+##R-Markdown
+
+MikTeX url: <https://miktex.org/download>
+
+```{r}
+#install.packages('tinytex')
+#tinytex::install_tinytex()
+
+
+```
+
+##Lecture exercise
+
+1.  make a contigency table and bar chart of **computer skills** and **gender** in the following data
+
+```{r}
+pc <- read_dta("http://masteringmetrics.com/wp-content/uploads/2015/02/bm.dta")
+
+glimpse(pc)
+
+pc_label= c("yes", "no")
+pc_label2= c("male", "female")
+
+computer_skills= factor(pc$computerskills, labels = pc_label)
+gender= factor(pc$female, labels = pc_label2)
+
+pc_table= xtabs(~computer_skills + gender)
+
+pc_table
+
+```
+
+We can create a Bar chart:
+
+```{r}
+barplot(pc_table, ylim=c(0,3800), legend=T,main= 'Computer skills',
+args.legend = list(x="left"), col = c("skyblue", "red"))
+```
+
+
+
+2. enerate 1000 random numbers in R (show data distribution). Comment on data distribution
+
+```{r}
+random_num=rnorm(1000, 0, 1) #We make them as a normal distribution 
+
+hist(random_num, col = rgb(0.8, 0.8, 1), main = "Normal distribution")
+
+num=runif(1000, min=0, max=100)
+
+hist(num, col = rgb(0.8, 0.8, 1), main = "Uniform distribution") #more like a uniform
+
+```
+
+3. Create your own cross table in R (show a bar plot of your cross table)
+
+
+Look in Starwars
+
+
+4. Generate 100 random numbers. Format the data as annual time series from 1915 to 2015. Plot the annual time series.
+
+```{r}
+ts_data=rnorm(100, 0, 1)
+
+ts_data=ts(ts_data, start = c(1915), end = c(2015), frequency = 1)
+
+plot(ts_data, main="Random numbers" )
+
+```
+
+5. Generate 240 random numbers. Format the data as monthly time series from 1990M1 to 2010M12. Plot the monthly time series.
+
+
+
+```{r}
+ts_data1=rnorm(240, 0, 1)
+
+ts_data1=ts(ts_data1, start = c(1990, 1), end = c(2010,12), frequency = 12)
+
+plot(ts_data1, main="Random numbers")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
