@@ -124,6 +124,12 @@ library(haven) # And a package for loading different data types fast(er)
 # on the effect of having a non-black sounding name.
 dat <- read_dta("http://masteringmetrics.com/wp-content/uploads/2015/02/bm.dta")
 glimpse(dat)
+
+datt= read_csv(file="C:/Users/Simon ik mig/Desktop/Statistik 2021/Statistik-3.semester/dat.csv" )
+#More columns than column names. Drops the last column. 
+
+glimpse(datt)
+view(datt)
 ```
 
 ```{r}
