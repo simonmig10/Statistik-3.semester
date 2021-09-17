@@ -48,7 +48,7 @@ starwars%>%
 
 Convert from numerical into categorical. 
 ```{r}
-starwars1=starwars%>%
+starwars%>%
   drop_na(height)%>%
   filter(hair_color %in% c("brown", "white", "black"))%>%
   mutate(height = ifelse(height >= 180, 1,0), height= factor(height, labels = c("small", "tall")))%>%
@@ -58,7 +58,7 @@ starwars1=starwars%>%
   pivot_wider(names_from = height, values_from = n)%>%
   mutate(total= small + tall)
 
-starwars1
+
 ```
 
 Bar chart
