@@ -1,0 +1,155 @@
+---
+title: "Lektion 2"
+author: "Simon"
+date: "22/9/2021"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+```
+
+
+# Numerical measures
+
+**calculating percentiles and Quartiles**
+
+```{r}
+sales = c(85, 84, 80, 82, 60, 63, 65, 67, 70, 72, 75, 75)%>%sort()
+
+```
+```{r}
+quantile(sales, type = 6)
+```
+Calculate 44% percentile
+```{r}
+quantile(sales, type = 6, prob = c(0.44))
+```
+
+**Box-and-Whisker Plot (Cont)**
+
+```{r, fig.height=7, fig.width=10}
+set.seed(123)
+
+copenhagen = sample(seq(from = 10, to = 40, by = 3), size = 15, replace = T)
+zealand = sample(seq(from = 5, to = 25, by = 2), size = 15, replace = T)
+n_jutland = sample(seq(from = 5, to = 30, by = 3), size = 15, replace = T)
+central_jutland = sample(seq(from = 5, to = 35, by = 4), size = 15, replace = T)
+southern_denmark = sample(seq(from = 2, to = 28, by = 6), size = 15, replace = T)
+data = data.frame(copenhagen, zealand, n_jutland, central_jutland, southern_denmark)
+boxplot(data, lwd=1, main="Box-plot", xlab="Regions ", ylab="Sales",
+names=c("Copenhangen","Zealand","Northern Jutland","Central Jutland","Southern Denmark"))
+
+```
+We can make it in colors to make it more fancy 
+
+
+```{r, fig.height=7, fig.width=10}
+
+boxplot(data, lwd=1, main="Box-plot", xlab="Regions ", ylab="Sales",
+names=c("Copenhangen","Zealand","Northern Jutland","Central Jutland","Southern Denmark"),
+col = c("red","sienna","palevioletred1","royalblue2","yellow"))
+
+```
+
+Task: 
+- Calcculate 1st quartile, second quartile, and third quartile of the regions ploted 
+
+```{r}
+apply(data, 2,  quantile)
+
+
+data$copenhagen%>% quantile(type= 6)
+data$zealand%>% quantile(type= 6)
+data$n_jutland %>% quantile(type= 6)
+data$central_jutland%>% quantile(type= 6)
+data$southern_denmark%>% quantile(type= 6)
+
+
+```
+
+## Exercise
+
+
+*Assume two variables $x$ and $y$ in R:
+```{r}
+set.seed(213)
+x = sample(seq(from = 10, to = 1000, by = 3), size = 1241, replace = T)
+y = sample(seq(from = 10, to = 100, by = 3), size = 1241, replace = T)
+
+```
+
+
+*What is the number of observations?
+
+```{r}
+n_x=length(x); n_y=length(y)
+
+```
+
+*Show boxer and whisker plot of the two series. What do you see?
+
+```{r}
+data_xy=cbind(x,y)
+
+boxplot(data_xy, lwd=1, main="Box-plot", xlab="data ", ylab="numbers",
+names=c("x","y"),
+col = c("red","sienna"))
+
+
+```
+
+as it looks very bad we make one for each:
+
+```{r}
+boxplot(x, lwd=1, main="Box-plot", xlab="data ", ylab="numbers",
+names=c("x"),
+col = c("red"))
+
+boxplot(y, lwd=1, main="Box-plot", xlab="data ", ylab="numbers",
+names=c("y"),
+col = c("red"))
+```
+
+*What is the mean of $x$ and $y$ compare your results with mean(x) in R?
+
+```{r}
+
+mean_x=sum(x)/n_x; mean(x)
+
+mean_y=sum(y)/n_y; mean(y)
+
+```
+
+*Calculate the variance of $x$ and $y$, compare your results with var(x) in R:
+
+```{r}
+
+var_x=(sum((x-mean_x)^2))/(n_x-1);var_x
+
+var_y=(sum((y-mean_y)^2))/(n_y-1);var_y
+
+
+```
+*Calculate standard deviation of x and y, compare your results with sd(x) in R:
+
+```{r}
+sd_x=sqrt(var_x)
+
+sd_y= sqrt(var_y)
+
+```
+*Finally, calculate coefficient of variance for x and y.
+
+```{r}
+cv_x= sd_x/mean_x;cv_x
+
+cv_y= sd_y/mean_y;cv_y
+```
+*Assume x and y were return on assets. Which asset would you invest in?
+
+The one with lowest CV as this is the standard deviation compared with the mean. 
+
+
+# Basic Probability
+
