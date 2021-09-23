@@ -1,0 +1,89 @@
+---
+title: "Lektion 2 Example"
+author: "Simon"
+date: "23/9/2021"
+output: html_document
+---
+
+
+```{r}
+library(tidyverse) 
+library(magrittr)
+library(data.table)
+library(skimr)
+```
+
+
+```{r}
+data <- read_csv("https://sds-aau.github.io/SDS-master/M1/data/RI-clean.csv.gz")
+```
+
+```{r}
+data %>% head()
+```
+
+```{r}
+data %>% glimpse()
+```
+
+```{r}
+data%<>% 
+  select(driver_gender, violation)
+```
+
+
+Drop na's
+
+```{r}
+data%<>% drop_na()
+
+data %<>%
+  group_by(violation) %>%
+  count(driver_gender)%>%
+  mutate(violation=as.factor(violation), driver_gender= as.factor(driver_gender))
+
+data <- xtabs(data$n ~ data$violation + data$driver_gender)
+
+
+
+
+```
+
+
+
+
+## Conditional probability (cont) Exercise
+
+A company gathers data on the gender of its employees and their volleyball membership status
+
+```{r}
+d_prob=100 * prop.table(data)
+```
+
+**What is the probability that an employee is a male or current member of the volleyball club, i.e., find P(male ∪ current)?**
+
+```{r}
+p_male_seatbelt= d_prob[1,1]/100
+p_male= sum(d_prob[,2])/100
+p_seatbelt= sum(d_prob[5,])/100
+
+p_male + p_seatbelt - p_male_seatbelt 
+
+```
+**What is the probability that an employee is a female or a former member of the volleyball club, i.e., find P(female ∪ former)?**
+
+
+
+**What is the probability that an employee who is a male is also a former club member?**
+
+```{r}
+d_prob[2,1]/p_male
+```
+**What is the probability that an employee who is a female is also a current club member?**
+
+```{r}
+p_female= sum(d_prob[,2])/100
+
+d_prob[1,2]/p_female 
+```
+
