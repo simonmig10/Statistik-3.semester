@@ -256,21 +256,31 @@ table
 A company gathers data on the gender of its employees and their volleyball membership status
 
 ```{r}
-d_prob=100 * prop.table(volley1)
+d_prob= prop.table(volley1)
 ```
 
 **What is the probability that an employee is a male or current member of the volleyball club, i.e., find P(male ∪ current)?**
 
 ```{r}
-p_male= sum(d_prob[,1])/100
-p_current= sum(d_prob[1,])/100
 
-p_male*p_current
+p_male_current= d_prob[1,1]
+p_male= sum(d_prob[,1])
+p_current= sum(d_prob[1,])
+
+p_male + p_current - p_male_current
 
 ```
 **What is the probability that an employee is a female or a former member of the volleyball club, i.e., find P(female ∪ former)?**
 
-samme
+```{r}
+
+p_female_former= d_prob[2,2]
+p_female= sum(d_prob[,2])
+p_former= sum(d_prob[2,])
+
+p_female + p_former - p_female_former
+
+```
 
 **What is the probability that an employee who is a male is also a former club member?**
 
@@ -280,7 +290,7 @@ d_prob[2,1]/p_male
 **What is the probability that an employee who is a female is also a current club member?**
 
 ```{r}
-p_female= sum(d_prob[,2])/100
+p_female= sum(d_prob[,2])
 
 d_prob[1,2]/p_female 
 ```
@@ -288,9 +298,58 @@ d_prob[1,2]/p_female
 
 # Bayes Theorem
 
+## Exercises
+
+**Given P(A1) = 0.4, P(B1|A1) = 0.6, and P(B1|A2) = 0.7, what is the probability of P(A1|B1)?**
+
+We need to use the equation from slide 32
+
+```{r}
+p_a1 = 0.4
+p_b1_a1 = 0.6
+p_b1_a2 = 0.7
+p_a2= 1-p_a1
+
+(p_b1_a1*p_a1)/(p_b1_a1*p_a1+p_b1_a2*p_a2)
 
 
+```
 
+**Given P(A1) = 0.4, P(B1|A1) = 0.6, and P(B1|A2) = 0.7, what is the probability of P(A2|B2)?**
+
+We need the same function as we do not know b2
+
+```{r}
+p_b2_a2= 1- p_b1_a2
+p_b2_a1= 1-p_b1_a1
+p_a2= 1-p_a1
+
+(p_b2_a2*p_a2)/ (p_b2_a2*p_a2 + p_b2_a1*p_a1)
+
+```
+
+
+**A publisher sends advertising materials for an accounting text to 80% of all professors teaching the appropriate accounting course. 30% of the professors who received this material adopted the book, as did 10% of the professors who did not receive the material. What is the probability that a professor who adopts the book has received the advertising material?**
+
+```{r}
+
+#R= recived the book
+# A= adopted the book
+
+r1= 0.8
+r2= 1- r1
+
+a1_r1= 0.3
+a2_r1 = 1-a1_r1
+
+a1_r2 = 0.1
+a2_r2 = 1-a1_r2
+
+#We can now find r1_a1
+#Since we do not have p(a1) we need to use thhe same function as before
+
+r1_a1= (a1_r1*r1)/(a1_r1*r1+a1_r2*r2)
+```
 
 
 
