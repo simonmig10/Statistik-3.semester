@@ -153,3 +153,144 @@ The one with lowest CV as this is the standard deviation compared with the mean.
 
 # Basic Probability
 
+
+**Union of events**
+
+```{r}
+A=c(1,3,5); B=c(2,4,6)
+union(A,B)
+```
+**Intersections of events**
+
+```{r}
+
+A=c(1,2,3,5,6); B=c(2,4,6,8,9)
+intersect(A,B)
+
+```
+
+**probability Rules (cont)**
+
+Example 1: 50 people were surveyed to answer "What are the top 2 reasons you
+are late to work?". The responses were following:
+
+```{r}
+counts <- matrix(c(6, 14, 9, 2, 17, 2), ncol = 1, byrow = T)
+rownames(counts) <- c("Weather", "Overslept", "Alarm Failure", "Time Change", "Traffic", "Other")
+colnames(counts) <- c("Reason for being late")
+counts
+
+```
+We can calculate the relative frequency of the above example:
+
+```{r}
+100 * prop.table(counts, 2)
+
+```
+Example 2: For example, employees of a company are asked their membership
+status of a volleyball club in Aalborg as well as their gender:
+
+
+```{r}
+volley1 <- matrix(c(30, 20, 60, 30, 20, 20), ncol = 2, byrow = TRUE)
+colnames(volley1) <- c("Male", "Female")
+rownames(volley1) <- c("Current", "Former", "Never")
+volley1 <- as.table(volley1)
+100 * prop.table(volley1, 2)
+```
+
+```{r}
+100 * prop.table(volley1, 1) # This calculates row-wise relative frequencies
+```
+```{r}
+100 * prop.table(volley1) #Now its not column or row wise, so all 6 probabilities equals to 1 now
+
+
+```
+
+##Eercise
+
+```{r}
+library(tidyverse) # Data wrangling and plotting tools
+library(stargazer) # Package made to export regression and summary tables
+library(haven) # And a package for loading different data types fast(er)
+#### Load some data that we want to test out Data comes from an experiment
+#### run by Bertrand and Mullainathan (2004) on the effect of having a
+#### non-black sounding name.
+dat <- read_dta("http://masteringmetrics.com/wp-content/uploads/2015/02/bm.dta")
+```
+
+
+
+**Calculate a contigency table between education and interview call**
+
+```{r}
+labs1 = c("not", "primary", "high", "college", "university") # define attributes for interview call
+labs2 = c("no call", "call") # define attributes for race
+education = factor(dat$education, labels = labs1) # assign attributes
+interview = factor(dat$call, labels = labs2) # assign attributes
+table <- xtabs(~education + interview)
+table
+```
+
+**Calculate row wise probabilities**
+
+```{r}
+100 * prop.table(table, 1)
+```
+**Calculate column wise probabilities**
+
+
+```{r}
+100 * prop.table(table, 2)
+```
+**Calculate discrete distribution.**
+
+```{r}
+100 * prop.table(table)
+```
+
+
+## Conditional probability (cont) Exercise
+
+A company gathers data on the gender of its employees and their volleyball membership status
+
+```{r}
+d_prob=100 * prop.table(volley1)
+```
+
+**What is the probability that an employee is a male or current member of the volleyball club, i.e., find P(male ∪ current)?**
+
+```{r}
+p_male= sum(d_prob[,1])/100
+p_current= sum(d_prob[1,])/100
+
+p_male*p_current
+
+```
+**What is the probability that an employee is a female or a former member of the volleyball club, i.e., find P(female ∪ former)?**
+
+samme
+
+**What is the probability that an employee who is a male is also a former club member?**
+
+```{r}
+d_prob[2,1]/p_male
+```
+**What is the probability that an employee who is a female is also a current club member?**
+
+```{r}
+p_female= sum(d_prob[,2])/100
+
+d_prob[1,2]/p_female 
+```
+
+
+# Bayes Theorem
+
+
+
+
+
+
+
