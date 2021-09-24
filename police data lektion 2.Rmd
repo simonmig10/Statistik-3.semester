@@ -42,7 +42,7 @@ data %<>%
   count(driver_gender)%>%
   mutate(violation=as.factor(violation), driver_gender= as.factor(driver_gender))
 
-data <- xtabs(data$n ~ data$violation + data$driver_gender)
+data <- xtabs(n ~ violation + driver_gender, data = data)
 
 
 
@@ -63,9 +63,9 @@ d_prob=100 * prop.table(data)
 **What is the probability that an employee is a male or current member of the volleyball club, i.e., find P(male ∪ current)?**
 
 ```{r}
-p_male_seatbelt= d_prob[1,1]/100
-p_male= sum(d_prob[,2])/100
-p_seatbelt= sum(d_prob[5,])/100
+p_male_seatbelt= d_prob[1,1]
+p_male= sum(d_prob[,2])
+p_seatbelt= sum(d_prob[5,])
 
 p_male + p_seatbelt - p_male_seatbelt 
 
