@@ -1,0 +1,16 @@
+---
+title: "Examens opgaver statistik"
+author: "Simon"
+date: "28/9/2021"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+
+glimpse(starwars)
+
+starwars$height
+
+```
+
