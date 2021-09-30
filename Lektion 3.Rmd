@@ -1,0 +1,211 @@
+---
+title: "Lektion 3"
+author: "Simon"
+date: "30/9/2021"
+output: html_document
+---
+
+
+# Random Variable 
+
+
+
+# Probability distribution function of discrete random variables
+
+```{r}
+px = c(0.1, 0.2, 0.4, 0.3); barplot(px, names.arg = c(0,1,2,3))
+```
+
+
+# Properties of discrete random variables
+
+**Expected value of a discrete Random Variable**
+
+```{r}
+x = c(0, 1, 2, 3, 4, 5); px = c(0.15, 0.3, 0.2, 0.2, 0.1, 0.05)
+
+mean = sum(x * px)
+mean
+
+```
+**Variance of a discrete random variable**
+
+```{r}
+sum((x - mean)^2 * px)
+```
+
+##Example Expected value of functions of random variables. 
+
+```{r}
+x = c(10, 11, 12, 13, 14); px = c(0.1, 0.3, 0.3, 0.2, 0.1); c = 25000 + 900*x
+```
+
+We can easily calculate the mean of X:
+
+```{r}
+mean_x = sum(x * px)
+
+```
+
+We can also easily calculate the mean of total cost C; $µy = E[a + bX] = a + bµx$
+
+```{r}
+mean_c = 25000 + 900 * mean_x
+```
+
+We can easily calculate the variance of total cost C $\sigma^2_y= Var[a+bX]= b^2\sigma ^2_x$
+
+```{r}
+var_x = sum((x - mean_x)^2*px) # first calculate the variance of X
+var_c = (900^2)*(var_x)
+var_c
+```
+
+# Binomial Distribution
+
+To compute the binomial probabilities in R, we use dbinom. The probability of getting 1
+head in two coin tosses is:
+
+
+```{r}
+dbinom(1, size=2, prob=0.5)
+
+#The probabilities of getting 0, 1, 2 heads in two trials is:
+
+dbinom(0:2, size=2, prob=0.5)
+```
+**Number of sequences with x Successes in n Trails**
+
+```{r}
+choose(5,2) #In 10 sequences we can hit 2 heads out of 5 trails. 
+```
+##Example
+
+Suppose that a property dealer, John, has 5 contacts, and he believes that for each
+contact the probability of making a sale is 0.40.
+
+
+**a. Find the probability that he makes 1 sale**
+
+```{r}
+dbinom(1, size = 5, prob = 0.4)
+```
+
+
+**b. What is the probability that he makes at most 1 sale**
+
+```{r}
+sum(dbinom(0:1, size = 5, prob = 0.4))
+```
+
+
+**c. Find the probability that he makes between 2 and 4 sales (inclusive).**
+
+```{r}
+p2 = dbinom(2, size = 5, prob = 0.4)
+p3 = dbinom(3, size = 5, prob = 0.4)
+p4 = dbinom(4, size = 5, prob = 0.4)
+p2 + p3 + p4
+
+sum(dbinom(2:4, size = 5, prob = 0.4))
+```
+
+
+**d. Graph the probability distribution function.**
+
+```{r}
+x=dbinom(0:5, size = 5, prob = 0.4)
+```
+```{r}
+barplot(x, names.arg = c(0,1,2,3,4,5))
+
+```
+Lets try a few plots in R (note the probabilities):
+
+```{r}
+x <- dbinom(0:20, size = 20, prob = 0.2)
+y <- dbinom(0:20, size = 20, prob = 0.8)
+z <- dbinom(0:20, size = 20, prob = 0.5)
+```
+
+```{r}
+barplot(x, col = rgb(0.8, 0.8, 1), main = "asymmetric")
+barplot(y, col = rgb(0.8, 0.8, 1), main = "asymmetric")
+barplot(z, col = rgb(0.8, 0.8, 1), main = "symmetric")
+```
+
+**Cumulative Binomial Distribution in R**
+
+```{r}
+x <- dbinom(0:5, size = 5, prob = 0.4)
+x
+```
+```{r}
+x <- pbinom(0:5, size = 5, prob = 0.4)
+x
+```
+
+**Mean and Variance of binomial distribution**
+
+```{r}
+x <- 0:2
+px = dbinom(x, size = 2, prob = 0.5)
+mean=sum(x * px)
+
+var=5*0.4*0.6
+
+
+```
+
+
+# Exercise
+
+**Calculate the probability of 13 heads in 30 independent bernoulli trials**
+
+```{r}
+x=13
+dbinom(13, size = 30, prob = 0.5)
+
+```
+
+
+**Calculate the binomial distribution of the above experiment**
+
+```{r}
+y= dbinom(0:30, size = 30, prob = 0.5)
+barplot(y, names.arg = c(0:30))
+```
+
+
+**Calculate the cummulative distribution of the above experiment**
+
+```{r}
+y= dbinom(0:30, size = 30, prob = 0.5)
+z= cumsum(y)
+```
+
+```{r}
+par(mfrow=c(1,2))
+barplot(y, names.arg = c(0:30))
+barplot(z, names.arg = c(0:30))
+```
+
+**Calculate the mean and variance of heads in 30 bernoulli trials**
+Mean:
+```{r}
+x=0:30
+px= dbinom(x, size = 30, prob = 0.5)
+sum(x*px)
+```
+Variance:
+
+```{r}
+mean_x <- sum(x*px)
+sum((x-mean_x)^2*px) #Methode from discrete variables
+
+30*0.5*0.5 #Can also use the rule when its binomial.
+```
+
+
+
+
