@@ -6,6 +6,63 @@ output: html_document
 ---
 
 
+
+# Bayes Theorem
+
+## Exercises
+
+**Given P(A1) = 0.4, P(B1|A1) = 0.6, and P(B1|A2) = 0.7, what is the probability of P(A1|B1)?**
+
+We need to use the equation from slide 32
+
+```{r}
+p_a1 = 0.4
+p_b1_a1 = 0.6
+p_b1_a2 = 0.7
+p_a2= 1-p_a1
+
+(p_b1_a1*p_a1)/(p_b1_a1*p_a1+p_b1_a2*p_a2)
+
+
+```
+
+**Given P(A1) = 0.4, P(B1|A1) = 0.6, and P(B1|A2) = 0.7, what is the probability of P(A2|B2)?**
+
+We need the same function as we do not know b2
+
+```{r}
+p_b2_a2= 1- p_b1_a2
+p_b2_a1= 1-p_b1_a1
+p_a2= 1-p_a1
+
+(p_b2_a2*p_a2)/ (p_b2_a2*p_a2 + p_b2_a1*p_a1)
+
+```
+
+
+**A publisher sends advertising materials for an accounting text to 80% of all professors teaching the appropriate accounting course. 30% of the professors who received this material adopted the book, as did 10% of the professors who did not receive the material. What is the probability that a professor who adopts the book has received the advertising material?**
+
+```{r}
+
+#R= recived the book
+# A= adopted the book
+
+r1= 0.8
+r2= 1- r1
+
+a1_r1= 0.3
+a2_r1 = 1-a1_r1
+
+a1_r2 = 0.1
+a2_r2 = 1-a1_r2
+
+#We can now find r1_a1
+#Since we do not have p(a1) we need to use thhe same function as before
+
+r1_a1= (a1_r1*r1)/(a1_r1*r1+a1_r2*r2)
+```
+
+
 # Random Variable 
 
 
