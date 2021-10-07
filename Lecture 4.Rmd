@@ -1,0 +1,225 @@
+---
+title: "Lecture 4"
+author: "Simon"
+date: "7/10/2021"
+output: html_document
+---
+
+
+# Joint probability distribution 
+
+```{r}
+volley <- matrix(c(30, 20, 60, 30, 20, 20), ncol = 2, byrow = TRUE)
+colnames(volley) <- c("Male", "Female")
+rownames(volley) <- c("Current", "Former", "Never")
+volley1 <- as.table(volley)
+prop.table(volley)
+
+```
+
+
+# Marginal probability distribution 
+
+```{r}
+addmargins(prop.table(volley))
+```
+
+# Conditional probability distribution 
+
+```{r}
+prop.table(volley, margin = 2) # Columns are given 
+
+```
+```{r}
+prop.table(volley, margin = 1) #Rows are given
+```
+
+# Mean, variance and covariance of joint probability dist. 
+
+Create data table
+```{r}
+data <- matrix(c(0.17, 0.11,
+                 0.33, 0.17,
+                 0.11, 0.11),ncol = 2, byrow = TRUE)
+# Define column names
+colnames(data) <- c("1", "2")
+# Define row names
+rownames(data) <- c("1", "2", "3")
+data <- as.table(data)
+data
+```
+Calcualte merginal probabilities 
+
+```{r}
+table <- addmargins(prop.table(data))
+table
+```
+Create vectors that you need
+
+```{r}
+y=c(1,2,3)
+
+py2= data[,2]
+
+```
+calculate mean
+
+```{r}
+mean_y= sum(y*py2/0.39)
+mean_y
+```
+Calculate variance 
+
+```{r}
+var_y=sum((y-mean_y)^2*(py2)/0.39)
+var_y
+```
+
+
+**Statistical independence**
+
+
+**Mean of variables with joint probability dist.**
+
+```{r}
+data <- matrix(c(0.112, 0.074, 0.224,
+                 0.112, 0.074, 0.074,
+                 0.104, 0.134, 0.086), ncol = 3, byrow = TRUE)
+# Define column names
+colnames(data) <- c("2", "4", "6")
+# Define row names
+rownames(data) <- c("1", "2", "3")
+data <- as.table(data)
+prop.table(data)
+
+```
+```{r}
+table <- addmargins(prop.table(data))
+table
+```
+If we want to calculate the mean of Y take the marginal probabilities multiply by discrete values. 
+
+```{r}
+y=c(1,2,3)
+
+py=table[1:3,4]
+```
+
+```{r}
+mean_y= sum(y*py)
+mean_y
+```
+Calculate the variance
+
+```{r}
+sum((y-mean_y)^2*py)
+```
+
+# Exercise 
+
+
+**Recreate this table in R**
+
+```{r}
+data <- matrix( c (0.066, 0.044, 0.132, 0.066,
+                   0.044, 0.044, 0.033, 0.044,
+                   0.121, 0.099, 0.084, 0.073,
+                   0.026, 0.053, 0.042, 0.024), ncol = 4, byrow = TRUE)
+# Define column names
+colnames(data) <- c("1", "3", "5", "7")
+# Define row names
+rownames(data) <- c("1", "2", "3", "4")
+data <- as.table(data)
+data<- prop.table(data)
+data
+```
+
+
+**Calculate the marginal probabilities of X and Y**
+
+```{r}
+table <- addmargins(data)
+table
+```
+
+
+**Calculate the expected value of X and Y , i.e., E[X] and E[Y ]**
+
+Mean for X
+```{r}
+x=c(1,3,5,7)
+
+px=table[5,1:4]
+
+mean_x= sum(x*px); mean_x
+
+```
+Mean for Y
+
+```{r}
+y=c(1,2,3,4); py=table[1:4,5]
+mean_y = sum(y*px); mean_y
+
+```
+
+
+**Given the condition that we have x = 3, what is the probability of getting y=2, i.e., Calculate P(y = 2|x = 3)?**
+
+```{r}
+
+joint_p= table[2,2]
+marg_x3= table[5,2]
+p_y2_x3= joint_p/marg_x3; p_y2_x3
+```
+Or use the table: 
+
+```{r}
+tb=prop.table(data, margin=2)
+
+tb[2,2]
+```
+
+
+**Calculate the conditional mean and variance of X when y = 2?**
+
+```{r}
+x=c(1,3,5,7)
+
+px2=table[2,1:4]
+
+marg_y2= table[2,5]
+
+#Mean
+x_cond_mean= sum(x*px2/marg_y2);x_cond_mean
+
+#Variance
+sum((x - x_cond_mean)^2*(px2)/marg_y2)
+
+```
+
+**Calculate the variance of X and Y**
+
+We use the mean from before
+
+```{r}
+mean_x
+mean_y
+```
+```{r}
+var_x=sum((x - mean_x)^2*(px));var_x
+var_y=sum((y - mean_y)^2*(py));var_y
+
+```
+
+
+
+**Calculate the covariance between X and Y ?**
+
+```{r}
+cov_xy = 1*(1*0.066 + 3*0.044 + 5*0.132 + 7*0.066) +
+  2*(1*0.044 + 3*0.044 + 5*0.033 + 7*0.044) +
+  3*(1*0.121 + 3*0.099 + 5*0.084 + 7*0.073) +
+  4*(1*0.026 + 3*0.053 + 5*0.042 + 7*0.024) - mean_x*mean_y
+cov_xy
+```
+
