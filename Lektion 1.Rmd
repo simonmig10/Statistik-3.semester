@@ -10,8 +10,6 @@ library(tidyverse)
 library(plotrix)
 library(qcc)
 library(scatterplot3d)
-
-
 ```
 
 #Installing R and Rstudio
