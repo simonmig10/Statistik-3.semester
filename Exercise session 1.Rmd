@@ -43,6 +43,7 @@ tab <- xtabs( ~ age + race)
 
 ```{r}
 table <- tab[,-6] # It removes the 6th column (which is unknown and has zero entries)
+table
 ```
 
 
