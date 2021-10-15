@@ -1,0 +1,207 @@
+---
+title: "Lektion 5"
+author: "Simon"
+date: "14/10/2021"
+output: html_document
+---
+
+# Information on data
+
+The data file is shared on moodle called data.rds. This data is based on statistics for a state in the US where all the incidents of police stop and search are reported during Jan 2010 - Mar 2019. The purpose of the project is to investigate whether there is statistical evidence of police stopping people on the basis of their ethnicity. You can now start with the exercise.
+
+
+# Importing data
+
+You are provided with two variables from the data set (age and race). First, download the data.rds file and save it on your hard drive. You can then run the following command to import your file (you need to provide your file path where the data file is saved):
+
+
+```{r}
+rm(list=ls(all=T))
+library(tidyverse)
+library(lubridate)
+library(readr)
+data <- readRDS("data.rds")
+```
+
+If you look at the data, it consists of age up to 99. I would like you to create a subset of the sample where we can filter the data and only consider age from 18 - 45 years. The following command in R filters the data and creates a subsample of our choice.
+
+
+```{r}
+newdata <- subset(data, age >= 18 & age<=45)
+```
+
+
+# Section A (mandatory)
+
+**Q1: Create a cross table in R (also known as contingency table). Preferably keep age variable in rows and ethnicity (race) in columns. Below is just a sample:**
+
+```{r}
+age <- newdata$age
+race <- newdata$race
+tab <- xtabs( ~ age + race)
+```
+
+```{r}
+table <- tab[,-6] # It removes the 6th column (which is unknown and has zero entries)
+```
+
+
+**Q2: Convert your table to discrete probability distribution (prop.table function)**
+
+```{r}
+options(scipen=999)
+x <- prop.table(table)
+x
+```
+
+
+**Q3: Calculate marginal probability of age (Py) and race (Px).**
+
+```{r}
+tab <- addmargins(x)
+tab
+```
+
+
+**Q4: Plot the probability distribution of age (i.e., plot Py) - make sure your x-axis shows age from 1-45 and y-axis shows the probabilities. Which age group has the highest probabily of being stopped and searched by police officers**
+
+For pltoting the probability distribution of age, I need the marginal probability of age (Py). I can extract my Py from the table
+in R below (note that I do not need the last value in the column because it is the sum of all marginal probabilities):
+
+```{r}
+py= tab[1:28,6]
+barplot(py, col="skyblue")
+```
+
+
+**Q5: Plot the probability dist. of race (i.e, plot Px) - make sure your x-axis shows ethnic groups and y-axis shows the probabilities.**
+
+For pltoting the probability distribution of race/ethnic group, I need the marginal probability of race (Px). I can extract my Px
+from the table in R below
+
+```{r}
+px= tab[29,1:5] #29 instead of 28
+barplot(px, col="skyblue")
+```
+
+
+**Q6: Calculate the expected value of age, E[Y]**
+
+To calculate the expected value of age, I use the formula E[Y ] = PY (P y). I already have computed Py (marginal probability of
+age), I just need the vector for age which I can define as follows:
+
+```{r}
+Y=c(18:45) # age is from 18-45
+mean_age <- sum(Y*py)
+mean_age
+```
+
+
+**Q7: Calculate the variance of age, Var[Y]**
+
+To calculate the variance I can use the formula V ar[Y ] = P(Y − µy) 2(P y):
+
+```{r}
+var_age <- sum((Y - mean_age)^2*(py))
+var_age
+```
+
+
+**Q8: Calculate the conditional probability of age (give that the ethnic group is black) P(Y|black).**
+
+So, we need to calculate the conditional probability of the whole vector (age) given that the ethnicity is black. We can compute
+all conditional probabilities in R by typing:
+
+```{r}
+cp <- prop.table(x, margin=2)
+cp
+```
+
+In the above table, P(Y|black) is the second column which is our conditional probability of age given that the ethnic group is
+black. we can extract this column by writing:
+```{r}
+cp_black <- cp[,2]
+```
+**Q9: Calculate the conditional mean of age (given that the ethnic group is black), E(Y|black)**
+
+To calculate the conditional mean (given that the ethnic group is black), we simply need to use the formula
+
+P E[Y |black] =Y ∗ P(Y |black)
+
+```{r}
+c_mean <- sum(Y*cp_black)
+c_mean
+```
+
+**Q10: Calculate the conditional variance of age (given that the ethnic group is black), Var(Y|black)**
+
+To calculate the conditional mean (given that the ethnic group is black), we simply need to use the formula
+
+PV ar[Y |black] =(Y − µY |black) 2P(Y |black)
+
+```{r}
+c_var <- sum((Y - c_mean)^2*(cp_black))
+c_var
+```
+
+
+
+# Section B (optional)
+
+**A: Assume, the police stops a person who is of 20 years of age, what is the probability that the person is black?**
+
+In this case, the condition is that the person is of 20 years of age. We can obtain all conditional probabilities in R by assuming that the rows are given:
+
+```{r}
+cp1 <- prop.table(x, margin=1)
+cp1
+```
+
+
+**B: Assume, the police stops a person who is 19 years of age, what is the probability that the person is white?**
+I can see the answer is [0.4435]
+
+# Section C (mandatory)
+
+- Derive $Var(a + bX + cY )$ where a,b, and c are constants whereas X and Y are variables
+
+$$Var(a + bX + cY )$$
+$$b^2 Var(X) + c^2 Var(Y)$$ 
+$$b^2 \sigma_x^2 + c^2+\sigma_y^2$$
+
+- Derive $E(a + bX + cY)$
+
+
+$$E(a + bX + cY)$$
+$$a + bE(X) + cE(Y)$$
+$$a + b \mu_X + c \mu_Y$$
+
+- Show that the $Cov(X, X)$ can be written as the $Var(X)$
+
+We now the $cov(X,X) = E(X-\mu_X) (X- \mu_X)$
+
+And if we take the mean we need to sum and multiply by $p(x,x)$ which is just $p(x)$
+
+so: $E(X-\mu_X) (X- \mu_X)= \sum_x (x- \mu_x)^2 p(x)$
+
+
+- Show that $Cov(X, Y ) = E((X − \mu_X)(Y − \mu_Y))$ is also equal to $E(XY) − \mu_X\mu_Y$
+
+First we multiply the two parentheses together: 
+
+$$Cov(X, Y ) = E(XY - X \mu_Y -\mu_X Y + \mu_X \mu_Y)$$
+We can now take the expectations to each term 
+
+$$Cov(X, Y ) = E(XY) - E(X \mu_Y) - E(\mu_X Y) + E(\mu_X \mu_Y)$$
+And we get: 
+
+$$Cov(X, Y ) = E(XY) - \mu_X \mu_Y - \mu_Y \mu_X + \mu_X \mu_Y$$
+We have $\mu_X \mu_Y)$ three times where to times is minus, so we keep one:
+
+$$Cov(X, Y ) = E(XY) - \mu_X \mu_Y$$
+
+
+
+
+
+
