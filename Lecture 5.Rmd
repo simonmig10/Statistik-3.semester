@@ -1,0 +1,246 @@
+---
+title: "Lecture 5"
+author: "Simon"
+date: "3/11/2021"
+output: html_document
+---
+
+# Cumulative distribution function
+
+```{r}
+x=seq(1, 1000, 1); y=dunif(x, 0, 1000)
+
+
+curve(dunif(x, 0, 1000), from = 0, to = 1000, bty="n", ylim=c(0.000, 0.0012))
+
+```
+
+
+
+```{r}
+punif(750 , min = 0 , max = 1000) - punif(250 , min = 0 , max = 1000)
+```
+
+
+
+```{r}
+curve(dunif(x, 250, 750), from = 0, to = 1000, bty="n", col= "blue")
+
+```
+
+
+# Probability density function
+
+
+```{r}
+x <- c(-2,seq(-2,2,0.01),2)
+y <- c(0,dnorm(seq(-2,2,0.01)),0)
+curve(dnorm(x,0,1), bty="n", xlim=c(-3,3)); polygon(x,y,col='skyblue')
+```
+
+
+```{r}
+x=seq(1, 100, 1)
+curve(dunif(x, 0, 100), from = 0, to = 100, bty="n", ylim=c(0, 0.012)) 
+```
+
+
+# Expectation (mean) for continous random variable
+
+# Normal distribution
+
+```{r}
+curve(dnorm(x,0,1), bty="n", xlim=c(-3,3))
+```
+
+
+```{r}
+x <- seq(-6,6,length=500)
+plot(x,dnorm(x,mean=0,sd=1),type = "l",lty=1,lwd=3,col="blue"); curve(dnorm(x,0,1.5),add=TRUE,lty=2,col="blue", lwd=3)
+
+
+```
+Same mean different SD
+
+```{r}
+x <- seq(-6,6,length=500)
+plot(x,dnorm(x,mean=0,sd=1),type = "l",lty=1,lwd=3,col="blue"); curve(dnorm(x,0.5,1),add=TRUE,lty=2,col="blue", lwd=3)
+
+```
+
+```{r}
+library(mnormt)
+mu <- c(0,0); sigma <- matrix(c(2,0,0,2),2,2)
+x<-seq(-4,4,0.1); y<-seq(-4,4,0.1)
+f<-function(x,y){dmnorm(cbind(x,y), mu, sigma)}; z<-outer(x,y,f)
+persp(x,y,z, box=T, ticktype="detailed", theta=47, phi=6, expand = 0.65)
+
+```
+
+
+## Example 
+
+A company produces lightbulbs whose life follows a normal distribution, with a
+mean of 1,200 hours and a standard deviation of 250 hours. If we choose a
+lightbulb at random, what is the probability that its lifetime will be between 900
+and 1300 hours?
+
+- First calculate the corresponding z-score of the upper limit (1300 hours)
+and lowe limit (900 hours)
+
+```{r}
+z_low = (900 - 1200)/250; z_high= (1300 - 1200)/250
+
+pnorm(z_high, mean = 0, sd=1) - pnorm(z_low, mean = 0, sd=1)
+
+```
+
+We could also do this since it is normaly distributed
+
+```{r}
+pnorm(1300, mean = 1200, sd=250) - pnorm(900, mean = 1200, sd=250)
+
+```
+
+Assume we are instead given a probability 0.1151, and we are asked to calculate
+lifetime of bulbs a this probability
+
+
+```{r}
+qnorm(0.1151, mean = 1200, sd=250)
+
+```
+
+## Mini-Exercise
+
+Life span of people in a Aalborg is normally distributed with a mean 82
+years and standard deviation 6. What is the probability that a randomly
+selected person from this class in Aalborg will live more than 90 years?
+
+
+We can do it just using the normal distribution 
+
+```{r}
+1- pnorm(90, mean = 82, sd=6)
+```
+we can also transform to a standard normal distribution first
+
+```{r}
+z_score = (90 - 82)/6
+
+1- pnorm(z_score, mean = 0, sd=1)
+```
+
+# Joint distribution
+
+
+# Correlation
+
+We can very easily calculate mean, variannce, covariance, correlation in R:
+
+```{r}
+x=rnorm(100, 0, 2)
+y=rnorm(100, 1, 1)
+
+var(x) # variance of x
+
+mean(y) # mean of y
+
+sd(x) # standard deviation of x
+
+cov(x,y) # covariance between x and y
+
+cor(x,y) # correlation between x and y
+
+```
+
+# Exxercise 
+
+This is time for you to start dealing with real world data.
+Download quarterly GDP and unemployment rate data for Denmark from
+1995–2016.
+I Data can be downloaded Statistics Denmark
+
+https://www.statistikbanken.dk/statbank5a/selectvarval/saveselections.asp
+https://www.statistikbanken.dk/statbank5a/selectvarval/define.asp?PLanguage=0&subword=tabsel&MainTable=NAHO2&PXSId=219819&tablestyle=&ST=SD&buttons=0
+
+
+```{r}
+library(readxl)
+data <- read_excel("data lecture 5.xlsx")
+
+y= data$BNP
+u= data$U
+```
+**Calculate GDP growth. Plot the distribution of GDP growth and fit a probability density curve. Does it look like a normal distribution?**
+
+```{r}
+y_growth= diff(y)/y[-1]*100
+
+
+
+h<-hist(y_growth, breaks=10, col="blue", xlab="BNP growth rate")
+xfit<-seq(min(y_growth),max(y_growth),length=21)
+yfit<-dnorm(xfit,mean=mean(y_growth),sd=sd(y_growth))
+yfit <- yfit*diff(h$mids[1:2])*length(y_growth)
+hist(y_growth, breaks=10, col="blue", xlab="BNP growth rate"); lines(xfit, yfit, col="red", lwd=2)
+```
+Hard to say with such a small amount of observations, but looks left skewed duo to the one observation of -5%. 
+
+
+**Calculate the mean, variance and the standard deviation of both GDP growth and unemployment rate**
+
+y_growth
+
+```{r}
+#mean
+mean(y_growth)
+
+# variance
+
+var(y_growth)
+
+#standard deviation
+
+sd(y_growth)
+```
+Unemployment
+
+```{r}
+#mean
+mean(u)
+
+# variance
+
+var(u)
+
+#standard deviation
+
+sd(u)
+```
+
+
+**Calculate the covariance and correlation of unemployment rate and GDP growth. Is the correlation positive or negative?**
+
+```{r}
+#We need to first remove the first observation from unemployment
+length(u)
+u= u[2:22]
+
+#Covariance
+cov(y_growth, u)
+#Correlation
+cor(y_growth, u)
+```
+
+
+**Show the relationship between GDP growth and unemployment in a scatter plot (with a line).**
+
+```{r}
+data=cbind(y_growth, u)
+
+lm(y_growth~u)
+
+plot(data, type = "p"); abline(lm(u~y_growth))
+```
+
