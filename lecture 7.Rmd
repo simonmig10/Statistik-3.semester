@@ -1,0 +1,229 @@
+---
+title: "Lecture 7"
+author: "Simon"
+date: "11/11/2021"
+output: html_document
+---
+
+# Sampling distribution
+
+```{r}
+age=c(18, 19, 22, 21 ) # Mikael, Tanja, Tine, Simon
+```
+
+```{r}
+samples <- combn(age, 2) # this calculates all possible combinations when we randomly select 2 samples
+```
+
+```{r}
+samp_mean <- colMeans(samples)
+
+x=table(samp_mean); x
+```
+
+```{r}
+prop.table(x)
+```
+```{r}
+barplot(prop.table(x), col = rgb(0.8, 0.8, 1))
+```
+## Another example 
+
+```{r}
+set.seed(312); y=sample(1:30, 20)
+```
+
+```{r}
+samp_1=combn(y, 4); samp_1_m <- colMeans(samp_1) # sample with 4 obs.
+samp_2=combn(y, 10); samp_2_m <- colMeans(samp_2) # Sample with 10 obs.
+```
+
+```{r}
+hist(samp_1_m, col = rgb(0.8, 0.8, 1), xlim=c(2,28), xaxt='n', main="case 1 (random samples (n=4))", prob=T); axis(side = 1, at = seq(2, 28, by = 2)); lines(density(samp_1_m), lwd=2, col="red")
+hist( samp_2_m, col = rgb(0.8, 0.8, 1), xlim=c(2,28), xaxt='n', main="case 2 (random samples (n=10))", prob=T); axis(side = 1, at = seq(2, 28, by = 2)); lines(density(samp_2_m), lwd=2, col="red")
+```
+
+```{r}
+mean(y); mean(samp_1_m); mean(samp_2_m)
+```
+
+# Central limit theorem
+
+```{r}
+set.seed(213)
+pop_1 <- rnorm(1000, mean=4.9, sd = 2.1); pop_2 <- rf(1000, 10, 20)
+pop_3 <- runif(10000000, 1, 1000);
+```
+
+
+We can see it is 3 differnet distributions
+```{r}
+hist(pop_1, col="red", main = "Normal distribution")
+hist(pop_2, col="green", main = "Right-skewed")
+hist(pop_3, breaks=10, col="orange", main = "Uniform distribution")
+```
+
+We can take 1000 random samples with 5 obs. 
+```{r}
+x_samp5 = replicate(1000, mean(sample(pop_1, 5, replace = T)))
+y_samp5 = replicate(1000, mean(sample(pop_2, 5, replace = T)))
+z_samp5 = replicate(1000, mean(sample(pop_3, 5, replace = T)))
+```
+
+
+```{r}
+hist(x_samp5, prob=T, col="red", main="1000 samples from normal dist. (n=5)"); lines(density(x_samp5))
+hist(y_samp5, prob=T, col="green", main="1000 samples from right-skew dist. (n=5)"); lines(density(y_samp5))
+hist(z_samp5, prob=T, col="orange", main="1000 samples from uniform dist. (n=5)"); lines(density(z_samp5))
+```
+We can now do the same with 15 obs. 
+
+```{r}
+x_samp15 = replicate(1000, mean(sample(pop_1, 15, replace = T)))
+y_samp15 = replicate(1000, mean(sample(pop_2, 15, replace = T)))
+z_samp15 = replicate(1000, mean(sample(pop_3, 15, replace = T)))
+```
+
+
+```{r}
+hist(x_samp15, prob=T, col="red", main="1000 samples from normal dist. (n=15)"); lines(density(x_samp15))
+hist(y_samp15, prob=T, col="green", main="1000 samples from right-skew dist. (n=15)"); lines(density(y_samp15))
+hist(z_samp15, prob=T, col="orange", main="1000 samples from uniform dist. (n=15)"); lines(density(z_samp15))
+```
+
+
+# Sampling distribution of sample proportion
+
+
+
+# Sampling dist. of sample variance
+
+## Chi-Square distribution
+
+Population mean 50 and population variance 25 ($\sigma$ = 5) The sample size is 10 (we draw a new random sample 5000 times)
+
+```{r}
+pop <- rnorm (100000 , mean = 50 , sd = 5 )
+variances <- replicate (5000 , var (sample (pop, 10 )))
+hist (variances, prob=TRUE, col="skyblue" )
+```
+
+Let us look at the distribution using eq on slide 29
+
+```{r}
+hist(variances*(10-1)/var(pop), prob=TRUE, col="skyblue"); curve(dchisq(x, df = 9), from = 0, to = 35, add = TRUE)
+```
+## Exxample
+
+```{r}
+1 - pchisq(14.4, df = 9)
+```
+
+```{r}
+qchisq(0.05, df = 10); qchisq(0.95, df = 10)
+```
+
+
+# Exercise
+
+
+**Create a population, which is normally distributed with the mean and standard deviation of your choice (as I have done on slide no. 28)**
+
+```{r}
+set.seed(213)
+pop <- rnorm(1e+05, mean = 5, sd = 5)
+```
+
+
+**Draw a new random sample 1000 times (the sample size should be 30, i.e., n=30) and calculate sample variances**
+
+```{r}
+sam_var <- replicate(1000, var(sample(pop, 30)))
+```
+
+
+**Prove that E(s2) = 2 and V ar(s2) = V ar(s2) = 24 n−1 where s2 refers to the sample variances, and 2 refers to the population variance**
+
+- E(s^2)
+```{r}
+mean(sam_var) 
+var(pop)
+```
+
+- Var(s^2)
+```{r}
+var(sam_var)
+```
+```{r}
+2 * (var(pop)^2)/29
+```
+
+
+**Plot the dist. of s2(n − 1)/2. Does it look like a chi-square distribution?**
+
+```{r}
+hist(sam_var * (30 - 1)/var(pop), breaks = 20, prob = TRUE, col = "skyblue"); curve(dchisq(x, df = 29), from = 0, to = 55, add = TRUE)
+```
+
+
+
+**Calculate the degrees of freedom in this example**
+
+```{r}
+30-1
+```
+
+**For the degrees of freedom that you have calculated, what is the chi-square value at the lower 0.01 interval and the upper 0.05 interval.**
+
+```{r}
+qchisq(0.01, df = 29); qchisq(0.95, df = 29)
+```
+
+
+
+**What is the probability that a sample (out of 1000) will have a variance below 35?**
+
+We need to calculate the equation 
+
+$$s^2 (n-1)/\sigma^2$$
+using $s^2 = 35$
+
+```{r}
+35*(30-1)/var(pop)
+```
+Now we have the chi-score value and can calculate the change
+
+```{r}
+pchisq(40.91, df = 29)
+```
+
+
+
+**What is the probability that a sample (out of 1000) will have a variance above 15?**
+
+We do the same with the new condition
+
+
+```{r}
+15*(30-1)/var(pop)
+```
+Now we have the chi-score value and can calculate the change, as we want the area to the left we take 1- the chance
+
+```{r}
+1- pchisq(17.53, df = 29)
+```
+
+**Repeat question no. 2 but this time draw a new random sample 1000 times (the sample size should be 5, i.e., n=5).**
+
+```{r}
+sam_var1 <- replicate(1000, var(sample(pop, 5)))
+```
+
+
+**Plot the dist. of s2(n − 1)/2. Does it look like a chi-square distribution? Comment on how the distribution has changed when we decreased the degrees of freedom.**
+
+```{r}
+curve(dchisq(x, df = 4), from = 0, to = 55, add = TRUE)
+```
+
+
