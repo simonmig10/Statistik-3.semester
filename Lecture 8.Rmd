@@ -1,0 +1,241 @@
+---
+title: "Lecture 8"
+author: "Simon"
+date: "18/11/2021"
+output: html_document
+---
+
+# Student's t distribution
+
+```{r}
+qt(1-0.025, df = 10)
+```
+## Exercise 
+
+```{r}
+
+data = read.csv("ryder.csv", header = T)
+x = as.numeric(data$hoejde) # we tell R this is a numerical data
+x = na.omit(x) # We leave out individuals for whom data is missing
+```
+
+
+```{r}
+n <- length(x) # calculates the no. of observations (n)
+m <- mean(x) # calculates the sample mean
+s <- sd(x) # calculates the sample standard deviation
+se <- s/sqrt(n) # calculates the standard error
+tscore <- qt(1-.025, df = n-1) # calculates the t score
+ME <- tscore*se # calculates the margin of error (ME)
+m + c(-ME,ME) # Calculates the lower and upper confidence limits of the mean of x
+```
+
+We can get this directly in R
+```{r}
+t.test(x)
+```
+
+
+# Confidence Intervals for Population Proportion
+
+We use the same dataset but now for proportions
+
+```{r}
+y = table(data$koen)
+y # we tell R this is categorical variable
+```
+we can get the proportions
+
+```{r}
+prob=y/sum(y)
+```
+Calculate using functions from slides
+
+```{r}
+p= as.numeric(prob[1]); p
+
+y = data$koen # we tell R this is a numerical data
+y = na.omit(y) # We leave out individuals for whom data is missing
+n_y=length(y)
+
+se= sqrt((p*(1-p))/n_y)
+zscore <- qt(1-.025, df= (n-1))# ik sikker om det er z eller t
+me= se*zscore
+p + c(-me,me) # Calculates the lower and upper confidence limits of the mean of x
+```
+
+```{r}
+prop.test(y, correct = FALSE)
+```
+
+# Condfidence Intervals for Population Proportion
+
+
+
+
+
+
+# Confidence interval for variance
+
+Assume we have a sample of 20 car dealers in Denmark, and we measure the
+number of weekly car sales. The standard deviation of the car sales is 3.
+Calculate the confidence interval of variance at 90%, 95%, and 99%?
+
+We have all the values but we need to check the value (in blue) from
+chi-square dist. table (here I will use R for only 95% confidence interval:)
+
+First, I calculate the (critical) value for lower tail at 95% with 19
+degrees of freedom (n − 1).
+
+```{r}
+qchisq(0.025, df=19)
+qchisq(1-0.025, df=19)
+```
+
+We can now calculate the confidence interval 
+
+Lower limit:
+
+```{r}
+n=20 # size of the sample
+s2=9 # variance of the sample
+(n-1)*s2/32.85
+```
+upper limit: 
+
+```{r}
+(n-1)*s2/8.907
+```
+
+# Sample size determination
+
+
+# Exercise
+
+**Discussion question: In Chi-square case, you noticed that we calculated the upper tail and lower tail values. Why did we not do that in the normal dist and student’s t distribution**
+
+Because Normal and T dist. are symmetric about the mean where as chi-square is not. In other words the lower tail and upper tail for normal and t dist. will return the same value but opposite signs, e.g.,
+
+```{r}
+qnorm(0.025); qnorm(1-0.025)
+```
+
+```{r}
+qt(0.025, df=30); qt(1-0.025, df=30)
+```
+
+```{r}
+qchisq(0.025, df=30); qchisq(1-0.025, df=30)
+```
+
+**Assume a sample of size (n=29) with mean 20 and variance of the population is known to be 500? Calculate the 95% confidence interval of mean**
+
+We can directly use the normal distribution case since population variance is known.
+
+Confidence intervals can be calculated as follows:
+
+1- calcculate standard errors: 
+
+```{r}
+n=29 # sample size
+sigma2= 500; sigma=sqrt(500) # population variance and standard deviation
+m= 20 # mean of the variable
+```
+
+
+```{r}
+se=sigma/sqrt(n)
+```
+
+
+2. calcculate the z values
+
+```{r}
+z=qnorm(1-0.025) # value of z_a/2 at 95% confidence level
+```
+
+
+3. calculate the mean error
+
+```{r}
+me=se*z
+```
+
+
+4. calcualte the upper and lower limit
+
+```{r}
+m + me; m - me
+```
+Same ccould be done in one call
+
+```{r}
+m + z*sigma/sqrt(n); m - z*sigma/sqrt(n)
+```
+
+
+**Assume we do not have the population variance, and the sample variance is 450. Calculate the 95% confidence interval of mean.**
+
+We cannot directly use the normal distribution case since population variance
+is unknown. But we are given sample variance, so we can proceed to use
+student’s t distribution in this case
+
+We do the same just using a t dist instead of a normal dist. 
+
+```{r}
+t=qt(1-0.025, 28) # value of t_a/2 at 95% confidence level with 28 degrees of freedom
+n=29 # sample size
+s2= 450; s=sqrt(450) # population variance and standard deviation
+m= 20 # mean of the variable
+```
+
+
+```{r}
+m + t*s/sqrt(n); m - t*s/sqrt(n)
+```
+
+
+**Calculate the 99% confidence interval of the variance**
+
+The formula for calculating confidence interval for variance is on slide 25
+
+
+```{r}
+chi_lower=qchisq(0.005, df=28) # value for lower tail dist. at 99%
+chi_upper=qchisq(1-0.005, df=28) # value for upper tail dist. at 99%
+```
+
+```{r}
+(n-1)*s2/chi_lower; (n-1)*s2/chi_upper
+```
+
+
+**Calculate the 90% confidence interval of the variance of height in the example**
+
+```{r}
+data = read.csv("ryder.csv", header = T)
+x = as.numeric(data$hoejde) # we tell R this is a numerical data
+x = na.omit(x) # We leave out individuals for whom data is missing
+```
+
+```{r}
+n <- length(x) # calculates the no. of observations (n)
+m <- mean(x) # calculates the sample mean
+s2 <- var(x); s2 # calculates the sample variance
+```
+```{r}
+chi_lower=qchisq(0.05, df=n-1) # value for lower tail dist. at 90%
+chi_upper=qchisq(1-0.05, df=n-1) # value for upper tail dist. at 90%
+```
+
+```{r}
+(n-1)*s2/chi_lower; (n-1)*s2/chi_upper
+```
+
+
+**Plot the distribution of heights. What kind of distribution does it look like?**
+
+```{r}
+hist(x, prob=T, col = rgb(0.8, 0.8, 1)); lines(density(x, adjust=2), lwd = 2, col="red")
+```
+
