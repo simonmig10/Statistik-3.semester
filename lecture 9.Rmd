@@ -1,0 +1,272 @@
+---
+title: "Lecture 9"
+author: "Simon"
+date: "25/11/2021"
+output: html_document
+---
+
+
+
+# Concept of hypothesis
+
+# Hypothesis test for mean (population variance known)
+
+**One-sided test for mean: population variance given (EXAMPLE)**
+
+We get a z-score of -1.788 
+
+For 5% significans level
+```{r}
+alpha=0.05
+qnorm(alpha) # note: for upper tailed test we write qnorm(1-alpha)
+## [1] -1.645
+```
+
+But not on a 1% significans level
+```{r}
+alpha=0.01
+qnorm(alpha, mean = 0, sd = 1)
+```
+To make our decision rule easier, we directly calculate the p-values:
+
+```{r}
+pnorm(-1.788)
+```
+P value (3%) clearly tells us that we can reject the null hypothesis at 5%
+significance level but not at 1% significance level
+
+
+**Two-sided test for mean: General procdeure when population variance is given**
+
+z-score is -1.788
+
+på et 5% significans niveau
+
+```{r}
+alpha=0.05
+qnorm(alpha/2)
+```
+For a two sided test we get p values from a normal dist:
+
+```{r}
+2*pnorm(-1.788)
+```
+
+
+# Hypothesis test for mean (population variance unknown)
+
+Note: now we use t statistics instead of z score AND replace sigma with standard dev
+of sample s because we do not know sigma )
+
+
+**One-sided t-test for mean: Example (read example no. 9.4 in Newbold)**
+
+Our t statistics is 2.81, so what is our conclusion?
+
+on a 5% significans level
+
+```{r}
+alpha=0.05
+qt(1-alpha, df=133)
+```
+on a 1% significans level 
+
+```{r}
+alpha=0.01
+qt(1-alpha, df=133)
+```
+P value: 
+
+```{r}
+1-pt(2.81, df=133)
+```
+**Two-sided t-test for mean**
+
+Our t statistics is 2.81
+
+```{r}
+alpha=0.05
+qt(1-alpha/2, df=133)
+```
+```{r}
+2*(1-pt(2.81, df=133))
+```
+
+```{r}
+alpha=0.05
+qnorm(1- alpha/2)
+```
+
+```{r}
+2*(1-pnorm(1.31))
+```
+
+
+# P value and Significanse level
+
+# Hypothesis test for proportion 
+
+Our z-score is 1.39, so what is our conclusion using significance level for 5%
+
+# Hypothesis test for variance 
+
+```{r}
+alpha=0.05
+qchisq(alpha, df = 24)
+```
+
+```{r}
+pchisq(20.78, df = 24)
+```
+
+
+# Exercise
+
+
+**1. We assume students study hours are normally distributed: $N(μ, \sigma)$, with mean $μ = 175$ and $\sigma$ = 5. Assume a sample of 20 students is selected. The mean of the sample $\bar{x} = 176$.**
+
+
+* Using 0.10, 0.05, and 0.01 significance level, test whether the mean of study hours is statistically higher from the population mean? (use one sided test).
+
+```{r}
+sigma= 5 #SD
+mu= 175 #Mean
+n=20 #Sample size
+x_bar= 176 #Sample mean
+
+se= sigma/sqrt(n)
+
+z_score= (x_bar-mu)/se; z_score
+```
+Calculate upper limit we use normal dist as we know pop variance
+
+```{r}
+alpha_1=1- 0.01
+alpha_5=1- 0.05
+alpha_10=1- 0.1
+
+
+qnorm(alpha_10)
+qnorm(alpha_5)
+qnorm(alpha_1)
+```
+We can not reject on 10% significans level, so we cant confirm if the mean is higher than 175. 
+
+
+* Calculate the corresponding p values in this example.
+
+p-value for the z-score 
+
+```{r}
+
+pnorm(z_score)
+
+```
+We can not reject!
+
+* Calculate the 95% confidence interval of mean
+
+We first ccalculate the z-scores for significans level on 95%
+
+```{r}
+
+alpha_5= 0.05
+
+# as it is symetric we need only one z-score
+
+z_score= qnorm(1- alpha_5/2)
+
+
+#We can now multiply with the standard error from above
+
+ME= z_score*se
+
+#Calculate the boundaries
+
+mu + c(-ME,ME)
+```
+
+**Suppose that we want to test the hypothesis with a significance level of .05 that the climate has changed since industrializatoin. Suppose that the mean temperature throughout history is 50 degrees. During the last 49 years, the mean temperature has been 51 degrees with a standard deviation of 2 degrees. What can we conclude?**
+
+```{r}
+mean= 50
+n=49
+x_bar=51
+s=2
+se=s/sqrt(n)
+
+alpha_5= 0.05
+```
+
+As we do not have the pop var we use student-t dist. 
+
+```{r}
+t_score= (x_bar-mean)/se
+```
+we can ccalculate the p-value
+
+```{r}
+1-pt(t_score, df=48)
+```
+We can see we can reject this on a 5% significans level, so we can conclude that given the sample values there is very litle change that the mean temperature is  50 degrees. so we reject the null hypothesis. 
+
+**Determine the lower and upper tail critical values of $\chi^2_{n-1}$ for each of the following:**
+
+Remember it is opposite as they are divided in the expression on slide 23 lektion 8. 
+
+$$\alpha= 0.01, n=26$$
+```{r}
+alpha=0.01; n=26
+upper_limit=qchisq(alpha, df = n-1);upper_limit
+lower_limit=qchisq(1-alpha, df = n-1);lower_limit
+```
+
+$$\alpha= 0.05, n=17$$
+
+```{r}
+alpha=0.05; n=17
+upper_limit=qchisq(alpha, df = n-1);upper_limit
+lower_limit=qchisq(1-alpha, df = n-1);lower_limit
+```
+$$\alpha= 0.10, n=14$$
+
+```{r}
+alpha=0.10; n=14
+upper_limit=qchisq(alpha, df = n-1);upper_limit
+lower_limit=qchisq(1-alpha, df = n-1);lower_limit
+```
+
+**We have a sample with $n = 25$ observations and sample variance $s^2 = 5.5$. Using $\alpha = 0.05$, test the following:**
+
+$$H_0: \sigma^2 = 6$$
+
+$$H_1: \sigma^2 \neq 6$$
+
+```{r}
+n=26
+s_2= 5.5
+alpha=0.05
+sigma_0=6
+```
+
+We calculate the chi-score:
+
+```{r}
+chi_score=(s_2*(n-1))/sigma_0
+```
+we can now calculate the limits
+
+```{r}
+qchisq(alpha/2, df = n-1)
+qchisq(1-alpha/2, df = n-1)
+```
+we can see the chi-score is between the two limits, so we can not reject the H0 and can say anything about if the variance is different from 6. 
+
+p-value: 
+
+```{r}
+pchisq(chi_score, df = n-1)
+```
+
+We can see the same here
+
