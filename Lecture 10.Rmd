@@ -1,0 +1,297 @@
+---
+title: "Lecture 10"
+author: "Simon"
+date: "28/11/2021"
+output: html_document
+---
+
+# Tests of the Difference Between two Normal Population Means: Dependent Samples case 
+
+## Dependent sample: Paired t-test
+
+```{r}
+set.seed(123)
+x=rnorm(25, 25, 5)
+y=rnorm(25, 24, 6)
+```
+
+
+```{r}
+z=x - y
+d= mean(z)
+s_d=sd(z)
+```
+
+
+```{r}
+n=25
+se=s_d/sqrt(25)
+t_stats= d/se
+```
+As we test for the upper critical value we take 1- the pvalue. 
+
+```{r}
+2*(1 - pt(t_stats, df = n-1))
+```
+
+```{r}
+t.test(x,y, paired = T)
+```
+
+### Example 
+
+```{r}
+Netto <- read.csv("Netto.csv", header = T)
+head(Netto, n = 3) # this shows the first 3 observations
+```
+```{r}
+t.test(Netto$before, Netto$after, paired = TRUE)
+```
+
+## Independent Sample test
+
+### Population variance known
+
+Use Z-score 
+
+### Population variance unkown
+
+#### Equal 
+
+Use t-score for less than 30 else special way to calculate degrees of freedom 
+
+#### Unequal 
+
+t-score and uses wheighted averrage to calculate sample variance to use for Standard error 
+
+# Test of the difference between two population proportions
+
+## Example 
+
+```{r}
+library(car); data("Chile")
+```
+```{r}
+Chile$voteNo <- factor(Chile$vote=="N")
+tab <- xtabs(~sex+voteNo, data=Chile)
+tab <- tab[ , c("TRUE", "FALSE")]
+tab
+```
+```{r}
+prop.test(tab, correct = FALSE)
+```
+
+# Comparing variance of two populations 
+
+```{r}
+set.seed(123); x <- rnorm(50, mean = 1, sd = 2); y <- rnorm(30, mean = 1, sd = 1.5)
+var_x=var(x); var_y=var(y)
+```
+
+Now we calculate the F statistics. But when calculating f stats, make sure the larger
+vaiance is the numerator, and lower variance is the denominator
+```{r}
+f_stats= var(x)/var(y)
+```
+
+Define the degrees of freedom for each sample
+
+
+```{r}
+dof_x= length(x) -1; dof_y=length(y) - 1
+```
+
+```{r}
+2*(1-pf(f_stats, df1=dof_x, df2= dof_y))
+```
+```{r}
+var.test(x, y)
+```
+
+
+
+
+# Exercise
+
+
+**Assume two independetn samples**
+
+```{r}
+set.seed(123)
+a=rnorm(1368, 0.065, 1 )
+b=rnorm(1315, -0.06, 0.99)
+```
+
+
+* Assume, population variances are unknown (and unequal). Test the null hypothesis, $H0 : \mu a − \mu b = 0$ against the alternative, $H1 : \mu a \neq \mu b$
+
+R can directly solve this problem
+
+
+```{r}
+t.test(a,b)
+```
+Make sure, your results can match the ones directly calculated by R.
+
+```{r}
+a_bar=mean(a)
+b_bar=mean(b)
+s_a= sd(a)
+s_b=sd(b)
+```
+
+
+```{r}
+n_a=length(a); n_b=length(b)
+se=sqrt((s_a^2/n_a) + (s_b^2/n_b))
+se
+```
+
+```{r}
+t_stats= (a_bar-b_bar)/se
+t_stats
+```
+
+```{r}
+2*(1 - pnorm(t_stats))
+```
+Hvis vi vil regne den for t-score skal vi regne degrees of freedom fra slides v=...
+
+
+**Assume, in the above example, population variances are unknown but assume to be equal. Test the null hypothesis, $H0 : \mu a − \mu b = 0$ against the alternative, $H1 : \mu a \neq \mu b$**
+
+R can directly solve this problem:
+
+```{r}
+t.test(a,b, var.equal = T)
+```
+Calculate the wheighted average of the sample variance
+
+```{r}
+sep = ((n_a - 1)*s_a^2 + (n_b - 1)*s_b^2)/(n_a + n_b -2)
+```
+
+CCCalculate t-score
+
+```{r}
+se=sqrt((sep/n_a) + (sep/n_b)); se
+t_stats= (a_bar-b_bar)/se; t_stats
+```
+
+```{r}
+2*(1 - pnorm(t_stats))
+```
+
+Ved ik helt hvad man gør med degrees of freedom her hvis ik de er lige lange samples. 
+
+
+**Use Chile data as on slide no. 21. There is a categorical variable education in which PS refers to post secondary education (or higher education). Assume, we are interested in investigating the association between education and voting YES.**
+
+
+Create a category of highly educated people using variable PS (make only 2 categories,
+proportion with high education (PS) and a proportion without high education)
+
+
+Create a category of voters who voted YES (make only 2 categories, proportion who voted
+YES and a proportion who did not vote YES)
+
+- We first tell R that people with PS education should be assigned TRUE, otherwise FALSE.
+
+```{r}
+library(car); data("Chile")
+Chile$PS_educ <- factor(Chile$education=="PS")
+
+n_x=1351+733
+n_y=130+308
+```
+
+- We also tell R that people who voted YES should be assigned TRUE, otherwise FALSE.
+
+
+```{r}
+Chile$voteYES <- factor(Chile$vote=="Y")
+```
+
+Before defining the table it is important to understand the question. Our interest is in
+finding the association of education and voting YES.
+
+```{r}
+tab <- xtabs(~PS_educ + voteYES, data=Chile)
+tab <- tab[ , c("TRUE", "FALSE")]; tab
+```
+
+
+* Assume the proportion of people who have higher education and voted yes is $P_x$
+
+```{r}
+p_x=733/(1351+733)
+```
+
+
+* Assume the proportion of people who have no higher education and voted YES is $P_y$
+
+```{r}
+p_y= 130/(130+308)
+```
+
+
+* Test the null hypothesis, $H0 : Py − Px = 0$ against two sided alternative
+$H1 : Py − Px 6= 0$
+
+We can calculate $p_0$:
+
+```{r}
+p_0= (n_x*p_x+n_y*p_y)/(n_x+n_y)
+
+se_0= sqrt((p_0*(1-p_0)/n_x)+(p_0*(1-p_0)/n_y))
+```
+
+Calculate z-value
+
+```{r}
+z_score= (p_x-p_y)/se_0
+```
+
+```{r}
+2*(1-pnorm(z_score))
+```
+
+
+
+
+* Also calculate the confidence interval of the difference in two proportions $(Py - Px )$.
+
+- We can assume the population proportions are independent 
+
+```{r}
+se_d= sqrt((p_x*(1-p_x)/n_x)+(p_y*(1-p_y)/n_y))
+```
+
+confidence intervals: 
+
+```{r}
+d=p_x-p_y
+
+z_score= qnorm(0.975)
+
+ME= z_score*se_d
+
+d + ME
+d- ME
+```
+
+
+
+
+We could do it all by: 
+
+
+```{r}
+prop.test(tab)
+```
+
+
+
+
+
+
