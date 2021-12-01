@@ -307,7 +307,9 @@ F_stats <- var_pa/var_nj
 F_stats
 ```
 ```{r}
-pf(F_stats, dof_nj, dof_pa, lower.tail = T)
+pf(F_stats, dof_nj, dof_pa, ncp = F, lower.tail= T, log.p = F)
+
+
 ```
 
 
@@ -360,6 +362,11 @@ se <- s_d/sqrt(n)
 t <- (x_2 - x_1)/se
 t
 ```
+```{r}
+2*(1-pt(t, df= n-1))
+```
+
+
 I can verify my results in R as follows:
 ```{r}
 t.test(low_wage$fte2, low_wage$fte, paired = T)
