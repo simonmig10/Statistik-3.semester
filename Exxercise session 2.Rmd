@@ -1,0 +1,371 @@
+---
+title: "Exercise session 2"
+author: "Simon"
+date: "30/11/2021"
+output: html_document
+---
+
+Information on data
+Economic theory predicts that a rise in minimum wage can lead perfectly competitive employers to cut employment. On April 1, 1992, New Jersey’s minimum wage rose from $4.25 to $5.05 per hour. To evaluate the impact of the law Card and Krueger (1994) surveyed 410 fast-food restaurants in New Jersey and eastern Pennsylvania before and after the rise in minimum wage per hour.
+
+**Importing data**
+
+You are provided with the data from the above survey. You can directly run the following command to
+import your data. Alternatively, you can download the data from moodle and save it on your hard drive and
+import it (you need to provide your file path where the data file is saved):
+
+
+```{r}
+library(tidyverse)
+library(haven)
+dat1 <- read_dta("http://masteringmetrics.com/wp-content/uploads/2015/02/minwage.dta")
+```
+
+
+Create subsets in the data to separate the sample of New Jersey and Pennsylvania
+
+
+```{r}
+nj <- subset(dat1, state == 1)
+#nj = dat1 %>% filter(state==1)
+pa <- subset(dat1, state == 0)
+#pa = dat1 %>% filter(state==0)
+```
+
+Get rid of the missing obs (NAs) from the datasets
+
+```{r}
+nj <- na.omit(nj)
+pa <- na.omit(pa)
+```
+
+
+All questions must be solved manually in R. You can verify your results by using built-in functions in R
+
+
+**Q1: Perform a hypothesis test on whether the mean of wage (wage_st) before the policy implementation is different from the mean of wage (wage_st2) after the policy implementation. That is, perform the following hypothesis:**
+
+
+$$H0: \mu_{wage_{st}} − \mu_{wage_{st2}} = 0$$
+$$H1 : \mu_{wage_{st}} − \mu_{wage_{st2}} \neq 0$$
+
+
+* Note: Perform the analysis for both New Jersey and Penn state.
+
+
+Vi ved det er dependent samples da det er 2 samples fra den samme befolkning --> derfor brug slide 4 lektion 10. 
+
+
+Calculate the mean wage for New Jersey:
+```{r}
+x_w_nj <- mean(nj$wage_st)
+x_w_nj
+```
+
+
+```{r}
+x_w_nj2 <- mean(nj$wage_st2)
+x_w_nj2
+```
+
+Calculate the mean and standard deviation of the differences in wages
+```{r}
+d_w_nj = mean(nj$wage_st2 - nj$wage_st)
+d_w_nj
+```
+
+```{r}
+sd_w_nj = sd(nj$wage_st2 - nj$wage_st)
+```
+
+Calculate the t statisticts as follows:
+```{r}
+n = length(nj$wage_st)
+se = sd_w_nj/sqrt(n)
+t= d_w_nj/se
+t
+```
+
+Calculate the p value:
+```{r}
+2*(1 - pt(t, df = n-1))
+```
+I can also verify my results with the built-in function in R:
+
+
+```{r}
+t.test(nj$wage_st2 , nj$wage_st , paired = T)
+```
+**Conclusion**: we reject the null hypothesis. In other words, minimum wage rates have significantly increased
+after the implementation of new policy.
+
+
+The same procedure can be carried out for Pennsylvania (but I just save time to do it directly!)
+
+```{r}
+y_w_pa <- mean(pa$wage_st)
+y_w_pa
+```
+
+```{r}
+y_w_pa2 <- mean(pa$wage_st2)
+y_w_pa2
+```
+
+```{r}
+t.test(pa$wage_st2 , pa$wage_st , paired = T)
+```
+**Conclusion**: We cannot reject the null hypothesis for New Jersey. This implies that wages have not changed
+in Pennsylvania (recall that the law was only implemented in New Jersey).
+
+
+
+
+
+**Q2: Perform a hypothesis test on whether the mean of full time workers (Fte) before the policy implementation is different from the mean of full time workers (Fte2) after the policy implementation. That is, perform the following hypothesis:**
+
+
+$$H0 : \mu_{fte} − \mu_{fte2} = 0$$
+
+$$H1 : μ[fte] − \mu_{fte2} \neq 0$$
+
+
+
+* Note: Perform the analysis for both New Jersey and Penn state.
+
+Så det samme som over er det dependent samples og derfor brugervi igen slide 4 lektion 10. 
+
+```{r}
+x_fte_nj <- mean(nj$fte)
+x_fte_nj
+```
+```{r}
+x_fte_nj2 <- mean(nj$fte2)
+x_fte_nj2
+```
+```{r}
+d_fte_nj = mean(nj$fte2 - nj$fte)
+d_fte_nj
+```
+
+```{r}
+sd_fte_nj = sd(nj$fte2 - nj$fte)
+```
+
+```{r}
+n = length(nj$fte2)
+se = sd_fte_nj/sqrt(n)
+t= d_fte_nj/se
+t
+```
+```{r}
+2*(1 - pt(t, df = n-1))
+```
+
+```{r}
+t.test(nj$fte2 , nj$fte , paired = T)
+```
+**Conclusion**: we cannot reject the null hypothesis for New Jersey. In other words, full time employment per
+store has not changed after the implementation of the new wage law in New Jersey.
+
+The same procedure can be carried out for Pennsylvania (but I just save time to do it directly!)
+
+```{r}
+y_fte_pa <- mean(pa$fte)
+y_fte_pa
+```
+```{r}
+y_fte_pa2 <- mean(pa$fte2)
+y_fte_pa2
+```
+```{r}
+t.test(pa$fte2 , pa$fte , paired = T)
+```
+**Conclusion**: We cannot reject the null hypothesis. This implies that wages have not changed in Pennsylvania
+(recall that the law was only implemented in New Jersey).
+
+
+
+
+
+**Q3: Test whether the mean of full time workers (Fte2) in Burger King has statistically increased or decreased after the new policy implementation. Formulate your hypothesis and explain your conclusion. Perform the anlaysis only for the state of New Jersey.}**
+
+Igen dependent samples derfor bruges igen slide 4 lektion 10 
+
+First, I create a subset for Burger King stores within the New Jersey dataset:
+
+```{r}
+bk <- subset(nj, chain==1) # chain = 1 in the data refers to burger king stores
+x1 <- mean(bk$fte)
+x2 <- mean(bk$fte2)
+s_d <- sd(bk$fte2 - bk$fte)
+n <- length(bk$fte)
+```
+I can now perform a t test:
+
+```{r}
+se = s_d/sqrt(n)
+t= (x2 - x1)/se
+t
+```
+p-value 
+
+```{r}
+2*(1-pt(t, df= n-1))
+```
+we can look what r gets
+
+```{r}
+t.test(bk$fte2 , bk$fte , paired = T)
+```
+
+
+
+
+**Q4: Perform a hypothesis test on whether the mean of wage (wage_st2) in New Jersey after policy implementation is different from the mean of wage (wage_st2) in Pennsylvania after the policy implementation. That is, perform the following hypothesis:**
+
+
+$$H0 : μ[wage_st2],[nj] − μ[wage_st2],[pa] = 0$$
+$$H1 : \mu_{wage_{st2},nj} − \mu_{wage_{st2},pa} \neq 0$$
+
+* Assume, the samples are independent, and the population variances are unknown, and assume to be equal.
+
+
+We now how independent samples as it is not the same population for both samples. We do not know the sample variance and can now assume if it is equal or unequal. 
+
+We assume it is equal --> use slide 14 lektion 10
+
+
+First, I calculate the mean of wage in the two states after the policy implementation
+
+```{r}
+x_2 <- mean(nj$wage_st2)
+x_2
+```
+
+```{r}
+y_2 <- mean(pa$wage_st2)
+y_2
+```
+
+```{r}
+nx <- length(nj$wage_st2)
+ny <- length(pa$wage_st2)
+```
+
+
+
+We first calculate a wheigted averrage of the two sample variances 
+
+```{r}
+s_x <- sd(nj$wage_st2)
+s_y <- sd(pa$wage_st2)
+sp <- ((nx - 1)*s_x^2 + (ny - 1)*s_y^2)/(nx + ny -2)
+```
+
+we can now calculate the Standard error
+
+```{r}
+se <- sqrt((sp/nx) + (sp/ny)); se
+```
+
+And now the t-score
+
+```{r}
+t <- (x_2 - y_2)/se; t
+```
+
+I can verify my results with the direct function in R:
+
+```{r}
+t.test(nj$wage_st2, pa$wage_st2, var.equal = T)
+```
+**Conclusion**: We can reject the null hypothesis and conclude that the wage rate in New jersey is statistically higher than in Penn state.
+
+**Q5: Perform a hypothesis test whether the variance of wage (wage_st) in New Jersey before policy implementation is different from the variance of wage (wage_st) in Pennsylvania before the policy implementation. That is, perform the following hypothesis:**
+
+$$H0 : \sigma^2_{wage_{st},nj} − \sigma^2_{wage_{st},pa} = 0$$
+
+$$H1 : \sigma^2_{wage_{st},nj} − \sigma^2_{wage_{st},pa} \neq 0$$
+I can simply calculate the variance of the two samples and then perform and F test. slide 23 lektion 10
+
+
+```{r}
+var_nj <- var(nj$wage_st); var_nj
+```
+```{r}
+var_pa <- var(pa$wage_st); var_pa
+```
+```{r}
+dof_nj <- length(nj$wage_st) - 1 # define degrees of freedom
+dof_pa <- length(pa$wage_st) - 1 # define degrees of freedom
+```
+
+
+```{r}
+F_stats <- var_pa/var_nj
+F_stats
+```
+```{r}
+pf(F_stats, dof_nj, dof_pa, lower.tail = T)
+```
+
+
+
+I can verify my results in R by directly using the function
+
+```{r}
+var.test(pa$wage_st, nj$wage_st)
+```
+Tester om ratioen mellem de to variance er ligmed 1 --> vi kan ik afvise. 
+
+
+
+
+**Q6. In New Jersey, there were some low paying stores which were paying $4.25 per hour before the implementation of the new law. How did the implementation of new wage policy affected full time employment in these low paying stores? Does statistical evidence support theoretical predictions that increasing minimum wages reduces employment?**
+
+```{r}
+glimpse(dat1)
+```
+
+
+We need to pick out the stores having a minimum wage before the policy implementation. as the two samples incclude the same stores they are dependent. so we use again slide 4 lektion 10
+
+
+```{r}
+low_wage = dat1 %>% filter(wage_st == 4.25) %>% drop_na()
+```
+
+
+```{r}
+x_1 <- mean(low_wage$fte)
+x_1
+```
+
+```{r}
+x_2 <- mean(low_wage$fte2)
+x_2
+```
+
+```{r}
+n <- length(low_wage$fte)
+```
+
+
+I can now simply perform a t test as follows:
+
+```{r}
+s_d <- sd(low_wage$fte2 - low_wage$fte)
+se <- s_d/sqrt(n)
+t <- (x_2 - x_1)/se
+t
+```
+I can verify my results in R as follows:
+```{r}
+t.test(low_wage$fte2, low_wage$fte, paired = T)
+```
+
+**Conclusion**: An increase in minimum wage has not affected the full time employment. Thus, preliminary
+statistical evidence does not lend support to economic theory in this case.
+
+
