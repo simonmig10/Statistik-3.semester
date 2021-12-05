@@ -1,0 +1,56 @@
+---
+title: "lektion 12"
+author: "Simon"
+date: "5/12/2021"
+output: html_document
+---
+
+# Linear Regression Assumptions
+
+# Introduction to multiple linear regression
+
+# Interpretation of regression estimators
+
+```{r}
+library(foreign)
+data1<-read.dta("http://fmwww.bc.edu/ec-p/data/wooldridge/wage1.dta")
+```
+
+Bivariate model
+
+```{r}
+wage = data1$wage
+educ=data1$educ
+slr=lm(wage~educ)
+slr
+```
+
+multivariable model
+
+```{r}
+wage = data1$wage
+educ=data1$educ
+exper=data1$exper
+mlr=lm(wage~educ+exper)
+mlr
+
+summary(wage)
+
+```
+
++------+-------+--------+-------+-------+--------+
+| Min  | 1.  Q | Median | Mean  | 3Q    | Max    |
++======+=======+========+=======+=======+========+
+| 0.53 | 3.330 | 4.650  | 5.896 | 6.880 | 24.980 |
++------+-------+--------+-------+-------+--------+
+|      |       |        |       |       |        |
++------+-------+--------+-------+-------+--------+
+|      |       |        |       |       |        |
++------+-------+--------+-------+-------+--------+
+
+
+
+
+# Hypothesis testing
+
+# Exercises
