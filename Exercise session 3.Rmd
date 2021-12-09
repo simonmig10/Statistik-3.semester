@@ -1,0 +1,130 @@
+---
+title: "Exercise session 3"
+author: "Simon"
+date: "9/12/2021"
+output: html_document
+---
+
+
+```{r}
+library(pacman)
+p_load(tidyverse,rio)
+dat <- import("http://fmwww.bc.edu/ec-p/data/wooldridge/wage1.dta")
+dat %>% glimpse()
+```
+# 1. Create two scatterplots, one for education and wage, and one for experience and wage. Does it, in this simple descriptive analysis, look like a relation exist between wage and each of the two variables?
+
+
+```{r}
+p_load(gridExtra)
+```
+
+
+```{r}
+p1 <- dat %>%
+ggplot(aes(x = educ, y = wage)) +
+geom_point(color = "darkgreen",
+alpha = 0.7) +
+theme_classic()
+
+
+
+p2 <- dat %>%
+ggplot(aes(x = exper, y = wage)) +
+geom_point(color = "darkgreen",
+alpha = 0.7) +
+theme_classic()
+```
+
+```{r}
+grid.arrange(p1, p2, nrow = 1)
+```
+There appears to be a positive relation between education and wages. There is possibly one between experience and wages. Although, the latter is less apparent from a casual look at the data.
+
+
+
+# 2. Obtain estimates of $\beta_0$, $\beta_1$ , and \beta_2 using OLS
+
+```{r}
+mod1 <- lm(wage ~ educ + exper, data = dat)
+summary(mod1)
+```
+
+# 3. Interpret your coefficient estimates
+
+
+# 4. Using your estimated regression equation, calculate the predicted values of your model for the values of educ and exper in the dataset.
+
+```{r}
+## Coefficients from model
+coefs <- coef(mod1)
+coefs
+```
+
+
+```{r}
+dat <- dat %>%
+mutate(y_hat_1 = coefs[1] + coefs[2] * educ + coefs[3] * exper)
+```
+
+```{r}
+dat$y_hat_2 = predict(mod1)
+```
+
+```{r}
+sum(dat$y_hat_1 != dat$y_hat_2)
+```
+There is no difference between the predicted values using either method.
+
+# 5. Create a scatterplot with actual values of wage and predicted values of wage. Are there signs that the model fit better for some wage values than other?
+
+
+```{r}
+dat %>%
+ggplot(aes(x = wage, y = y_hat_1)) +
+geom_point(color = "darkgreen",
+alpha = 0.7) +
+geom_abline(slope = 1, intercept = 0) +
+lims(x = c(0, 25),
+y = c(0, 25)) +
+theme_classic() +
+labs(x = "Actual wage", "Predicted wage")
+```
+
+
+
+
+# 6. Show the equation of the residuals. Using your equation, calculate the residuals.
+
+```{r}
+dat <- dat %>%
+mutate(res = wage - y_hat_1)
+```
+
+# 7. Show the distribution of the residual (histogram). Does it look like a normal distribution?
+
+
+```{r}
+dat %>%
+ggplot(aes(x = res)) +
+geom_histogram(aes(y = ..density..),
+fill = "darkgreen", ) +
+stat_function(fun = dnorm,
+args = list(
+mean = mean(dat$res),
+sd = sd(dat$res)),
+color = "royalblue"
+) +
+lims(x = c(-10, 15)) +
+theme_classic()
+```
+
+
+# 8. Test whether each of educ and exper has a statistically significant relation with wage in the estimated model.
+
+## 8.a) Start by forming relevant null and alternative hypotheses, and choose a relevant significance level for the test.
+
+
+
+
+
