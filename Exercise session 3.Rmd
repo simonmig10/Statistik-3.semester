@@ -52,6 +52,15 @@ summary(mod1)
 
 # 3. Interpret your coefficient estimates
 
+• *Intercept*: We find an estimate of $-3.39. The estimated model suggest that were both education and
+experiences to be zero, wages would be negative. The person so endowed would have to pay to be on
+the labor market! Luckily, it rarely happens that an individual has neither education nor experience.
+
+• *educ*: The estimated coefficient for education is 0.64. This suggest that when education increases by
+one year, hourly wages increases on average by $0.64.
+
+• *exper*: The estimated coefficient for experience is 0.07. The estimate suggests that when experience
+increases by one year, hourly wages increases on average by $0.07.
 
 # 4. Using your estimated regression equation, calculate the predicted values of your model for the values of educ and exper in the dataset.
 
@@ -105,25 +114,71 @@ mutate(res = wage - y_hat_1)
 
 
 ```{r}
+hist(mod1$residuals, breaks=10, probability=T ,col="blue", xlab="res"); lines(density(mod1$residuals), col="red", lwd=2)
+```
+
+
+
+```{r}
 dat %>%
 ggplot(aes(x = res)) +
-geom_histogram(aes(y = ..density..),
-fill = "darkgreen", ) +
-stat_function(fun = dnorm,
-args = list(
-mean = mean(dat$res),
-sd = sd(dat$res)),
-color = "royalblue"
-) +
-lims(x = c(-10, 15)) +
-theme_classic()
+  geom_histogram(aes(y = ..density..), fill = "darkgreen", ) +
+  stat_function(fun = dnorm, args = list(mean = mean(dat$res),sd = sd(dat$res)),color = "royalblue") +
+  lims(x = c(-10, 15)) +
+  theme_classic()
+
 ```
 
 
 # 8. Test whether each of educ and exper has a statistically significant relation with wage in the estimated model.
 
-## 8.a) Start by forming relevant null and alternative hypotheses, and choose a relevant significance level for the test.
+We can observe the t-statistics directly in the output.
 
+```{r}
+summary(mod1)
+```
+We can also calculate them by hand instead
+
+```{r}
+t_educ <- ( 0.64427 - 0 ) / 0.05381
+t_exper <- ( 0.07010 - 0 ) / 0.01098
+c(t_educ, t_exper)
+```
+The critical values for the hypothesis tests
+
+```{r}
+n <- mod1$residuals %>% length()
+k <- mod1$rank
+df <- n - k - 1
+t_lower <- qt(0.025, df = df)
+t_upper <- qt(0.975, df = df)
+c(t_lower, t_upper)
+```
+
+We can also calculate p-values
+
+```{r}
+p_educ <- 1 - pt(t_educ, df = df)
+p_exper <- 1 - pt(t_exper, df = df)
+c(p_educ, p_exper)
+```
+The p-values are both far below 0.05, the statistical significance level chosen for the test. As a result, we can
+reject both null hypotheses.
+
+
+# 9. Assume you are interested in testing the hypothesis whether the effect of educ on wage is equal to 0.5 or not.
+
+The null hypothesis is
+$H0 : \beta_1 = 0.5, H1 : \beta_1 \neq 0.5$
+I will test the hypothesis at a 5 percent significance level.
+
+
+Calculate t-values
+
+```{r}
+t_stat <- ( 0.64427 - 0.5 ) / 0.05381
+c(t_stat, t_lower, t_upper)
+```
 
 
 
